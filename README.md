@@ -4,6 +4,19 @@ A ZX Spectrum 48K / 128K / Pentagon emulator written in plain PHP, with no exten
 
 ![Pentagon 128 boot menu](docs/pentagon-menu.png)
 
+## Screenshots
+
+Real demos running in the emulator (graphics mode, `--scale=2`):
+
+| | | |
+|:---:|:---:|:---:|
+| ![AY 3 Demo](docs/screenshots/ay3-demo.png) | ![Burn to live](docs/screenshots/burn-to-live.png) | ![Shock Megademo](docs/screenshots/shock-megademo.png) |
+| **AY 3 Demo** (Thrash Soft, 1992): TR-DOS disk, AY music | **Burn to live**: 208-byte fire intro from a TR-DOS disk | **Shock Megademo** (ESI, 1992): loaded from a TZX tape |
+
+The demos belong to their authors and are not included in this repository; they are available from
+[Spectrum Computing](https://spectrumcomputing.co.uk): [AY 3 Demo](https://spectrumcomputing.co.uk/entry/7260),
+[Burn to live](https://spectrumcomputing.co.uk/entry/34395), [Shock Megademo](https://spectrumcomputing.co.uk/entry/7726).
+
 ## Features
 
 - **Z80 CPU.** All documented and undocumented instructions are implemented, including IXH/IXL, SLL, `OUT (C),0` and DDCB register copies. The core passes all 67 ZEXDOC tests.
