@@ -9,13 +9,16 @@ use ZX\Spectrum\Machine\Memory;
  * Instant tape loading through the ROM routine LD-BYTES (address 0556).
  *
  * On entry the ROM expects A = flag byte, IX = address, DE = length and carry set for LOAD (reset for
- * VERIFY). The trap does the whole job at once and leaves through SA/LD-RET (053F), which restores the
- * border and enables interrupts, exactly as the ROM would.
+ * VERIFY). The trap does the whole job at once; the machine then returns to the caller the way the
+ * ROM's SA/LD-RET (053F) would: border restored, interrupts enabled, but without its BREAK test. A real
+ * load takes seconds, so the key that started it (often SPACE, which is also BREAK) has long been
+ * released; after an instant load it is usually still held.
  */
 final class TapeTrap
 {
     public const int LD_BYTES = 0x0556;
-    private const int SA_LD_RET = 0x053F;
+    /** System variable BORDCR: border colour in bits 3-5. */
+    private const int BORDCR = 0x5C48;
 
     /** True when the 48 BASIC ROM routine is really there (and not, for example, TR-DOS). */
     public static function romHasLoader(Memory $memory): bool
@@ -26,7 +29,13 @@ final class TapeTrap
             && $memory->read(self::LD_BYTES + 1) === 0x08;  // EX AF,AF'
     }
 
-    /** Loads (or verifies) one tape block (flag byte, data, parity byte) as LD-BYTES would. */
+    /** The border colour the ROM restores after loading. */
+    public static function borderColour(Memory $memory): int
+    {
+        return ($memory->read(self::BORDCR) & 0x38) >> 3;
+    }
+
+    /** Loads (or verifies) one tape block (flag byte, data, parity byte) as LD-BYTES would; carry = success. */
     public static function load(string $block, Z80 $cpu, Memory $memory): void
     {
         $ok = false;
@@ -58,6 +67,5 @@ final class TapeTrap
             $cpu->e = $requested & 0xFF;
         }
         $cpu->f = $ok ? ($cpu->f | 1) : ($cpu->f & 0xFE);
-        $cpu->pc = self::SA_LD_RET;
     }
 }

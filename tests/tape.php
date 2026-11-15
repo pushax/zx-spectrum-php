@@ -50,7 +50,8 @@ if (!is_file($rom)) {
 }
 
 /** Types LOAD "" and runs until the program has poked 42 into 32768. */
-function loadWithBasic(string $tape, string $rom, int $maxFrames): int
+/** With $holdSpace, SPACE (also BREAK) is held while the tape loads, as a terminal key press can be. */
+function loadWithBasic(string $tape, string $rom, int $maxFrames, bool $holdSpace = false): int
 {
     $m = new Spectrum48($rom);
     $m->tape = Tape::open($tape);
@@ -64,7 +65,10 @@ function loadWithBasic(string $tape, string $rom, int $maxFrames): int
                 }
             }
         }
-        foreach ([[6, 3], [7, 1], [5, 0], [6, 0]] as [$r, $b]) {
+        if ($holdSpace && $i >= 211 && $i < 260) {
+            $down['7:0'] = true;
+        }
+        foreach ([[6, 3], [7, 1], [5, 0], [6, 0], [7, 0]] as [$r, $b]) {
             $m->ula->setKey($r, $b, isset($down["$r:$b"]));
         }
         $m->runFrame();
@@ -81,6 +85,10 @@ check($f > 0 && $f < 240, "TAP: LOAD \"\" should load instantly (frame $f)");
 // TZX: unreadable turbo block skipped, ROM-timed turbo blocks loaded through the trap.
 $f = loadWithBasic("$dir/t.tzx", $rom, 400);
 check($f > 0 && $f < 240, "TZX: ROM-readable blocks should load instantly (frame $f)");
+
+// Instant loading must not report BREAK for a key still held from the keypress that started it.
+$f = loadWithBasic("$dir/t.tap", $rom, 400, true);
+check($f > 0 && $f < 260, "TAP: SPACE held during an instant load must not stop it with BREAK (frame $f)");
 
 // Real signal: run the ROM loader past the trap (entry 055A) and let it read the custom-timed code block
 // (the ROM accepts these timings within its tolerance window, the trap does not, so pulses are used).

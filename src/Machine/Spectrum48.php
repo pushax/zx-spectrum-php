@@ -261,6 +261,14 @@ final class Spectrum48
         }
         $this->tape->playing = false;
         TapeTrap::load($block, $this->cpu, $this->memory);
+
+        // Return to the caller like SA/LD-RET, without its BREAK test (see TapeTrap).
+        $border = TapeTrap::borderColour($this->memory);
+        $this->writePort(($border << 8) | 0xFE, $border);
+        $cpu = $this->cpu;
+        $cpu->iff1 = $cpu->iff2 = true;
+        $cpu->pc = $this->memory->readWord($cpu->sp);
+        $cpu->sp = ($cpu->sp + 2) & 0xFFFF;
     }
 
     /** Starts the tape when a loader polls the EAR bit hard (custom loaders), pauses it when polling stops. */
