@@ -2,6 +2,7 @@
 
 namespace ZX\Spectrum;
 
+use ZX\Spectrum\Machine\Spectrum48;
 use ZX\Spectrum\Sound\Ay8912;
 
 require __DIR__ . '/../src/autoload.php';
@@ -97,5 +98,14 @@ $ay->write(1, 0xFF);
 $ay->write(6, 0xFF);
 $ay->write(8, 0xFF);
 check($ay->read(1) === 0x0F && $ay->read(6) === 0x1F && $ay->read(8) === 0x1F, 'Register masks');
+
+// An AY interface on a 48K (--ay): registers are written and read back through ports BFFD/FFFD.
+$m = new Spectrum48(null, null, false, true);
+$m->memory->load(0x8000, "\x01\xFD\xFF\x3E\x08\xED\x79\x06\xBF\x3E\x0F\xED\x79\x06\xFF\xED\x78\x76");
+// LD BC,FFFD; LD A,8; OUT (C),A; LD B,BF; LD A,15; OUT (C),A; LD B,FF; IN A,(C); HALT
+$m->cpu->pc = 0x8000;
+$m->runInstructions(10);
+check($m->ay !== null && $m->ay->read(8) === 15 && $m->cpu->a === 15, '48K + AY: register 8 written and read back');
+check((new Spectrum48())->ay === null, 'A plain 48K has no AY');
 
 echo "AY tests passed\n";

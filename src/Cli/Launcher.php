@@ -23,7 +23,7 @@ final class Launcher
     /** Options for getopt(). */
     public const array OPTIONS = [
         'demo', 'screen:', 'snapshot:', 'boot', 'rom:', 'cpu-test', 'no-audio', 'machine:', 'clock-hz:',
-        'frame-tstates:', 'debug', 'gfx:', 'scale:', 'disk:', 'trdos:', 'tape:',
+        'frame-tstates:', 'debug', 'gfx:', 'scale:', 'disk:', 'trdos:', 'tape:', 'ay',
     ];
 
     private const string USAGE = <<<'TEXT'
@@ -34,7 +34,7 @@ final class Launcher
                      [--gfx=auto|kitty|iterm|text] [--scale=2]
          php run.php --boot --rom=48.rom [--machine=48k] [--no-audio] [--debug]
          php run.php --disk=demo.trd|demo.scl --rom=pentagon.rom [--trdos=trdos.rom] [--boot]
-         php run.php --tape=game.tap|game.tzx [--machine=48k|pentagon] [--rom=48.rom]
+         php run.php --tape=game.tap|game.tzx [--machine=48k|pentagon] [--rom=48.rom] [--ay]
          php run.php --cpu-test
 
         TEXT;
@@ -136,7 +136,7 @@ final class Launcher
             $o['machine'] = 'pentagon';
         }
         $timing = $this->timing();
-        $machine = new Spectrum48($rom, $timing, $this->isPentagon());
+        $machine = new Spectrum48($rom, $timing, $this->isPentagon(), isset($o['ay']));
         if ($rom === null) {
             fwrite(STDERR, "Warning: no --rom given, the ROM area is empty (0xFF). "
                 . "Most snapshots need the ROM: add --rom=48.rom\n");
@@ -259,7 +259,7 @@ final class Launcher
         $machine->setAudio($audio);
         fwrite(STDERR, sprintf(
             "Machine: %s | clock: %.3f MHz | frame: %d T | %.3f Hz\n",
-            $timing->name,
+            $timing->name . ($machine->ay !== null && !$this->isPentagon() ? ' + AY' : ''),
             $timing->clockHz / 1000000,
             $timing->frameTstates,
             $timing->frameRateHz()

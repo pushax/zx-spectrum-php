@@ -85,6 +85,7 @@ php run.php --boot --rom=128.rom --machine=pentagon   # 128 menu
 | `--rom=FILE` | 16K (48K) or 32K (128K) ROM image. With no `--rom`, disks use `pentagon.rom`, 48K tapes use `48.rom` and 128K tapes use `128.rom`. |
 | `--trdos=FILE` | TR-DOS ROM. Default: `trdos.rom` in the project folder. |
 | `--machine=48k\|pentagon` | Machine model. Default: `48k`. |
+| `--ay` | Add an AY sound chip to the 48K (like the Melodik interface). 128K machines always have one. |
 | `--gfx=auto\|kitty\|iterm\|text` | Display mode. Default: `auto`. |
 | `--scale=N` | Picture scale, 1–8. Default: 2, giving 640×480. |
 | `--no-audio` | Turn sound off. |

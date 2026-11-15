@@ -29,7 +29,7 @@ final class Spectrum48
     public readonly ULA $ula;
     /** Beam-accurate picture of the last complete frame. */
     public readonly BeamRenderer $beam;
-    /** AY-3-8912, present on 128K/Pentagon machines. */
+    /** AY-3-8912: built into 128K/Pentagon machines, optional on a 48K (an AY interface such as Melodik). */
     public readonly ?Ay8912 $ay;
     /** AY register selected through port FFFD. */
     public int $aySelected = 0;
@@ -47,13 +47,19 @@ final class Spectrum48
     private int $earReads = 0;
     private int $quietFrames = 0;
 
-    public function __construct(?string $romFile = null, ?MachineTiming $timing = null, bool $banked128 = false)
-    {
-        $this->machineName = $banked128 ? 'Pentagon 128' : 'Spectrum 48K';
+    /** @param bool $withAy add an AY chip to a 48K (128K machines always have one) */
+    public function __construct(
+        ?string $romFile = null,
+        ?MachineTiming $timing = null,
+        bool $banked128 = false,
+        bool $withAy = false,
+    ) {
+        $hasAy = $banked128 || $withAy;
+        $this->machineName = $banked128 ? 'Pentagon 128' : ($hasAy ? 'Spectrum 48K + AY' : 'Spectrum 48K');
         $this->memory = new Memory($romFile, $banked128);
         $this->ula = new ULA($timing ?? MachineTiming::named('48k'));
         // The AY runs at half the CPU clock (1.75 MHz at 3.5 MHz), so --clock-hz keeps both consistent.
-        $this->ay = $banked128 ? new Ay8912(intdiv($this->ula->timing()->clockHz, 2)) : null;
+        $this->ay = $hasAy ? new Ay8912(intdiv($this->ula->timing()->clockHz, 2)) : null;
         $this->cpu = new Z80($this->memory);
         $this->beam = new BeamRenderer($this->ula->timing(), $this->memory, $this->ula);
         // Anything that changes the picture first lets the beam catch up to the current T-state.
