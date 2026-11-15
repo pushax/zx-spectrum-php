@@ -69,8 +69,8 @@ check(
 );
 
 // Full boot with the real ROMs (skipped when they are not present).
-$rom48 = __DIR__ . '/../48.rom';
-$trdosRom = __DIR__ . '/../trdos.rom';
+$rom48 = __DIR__ . '/../roms/48.rom';
+$trdosRom = __DIR__ . '/../roms/trdos.rom';
 if (is_file($rom48) && is_file($trdosRom)) {
     $m = new Spectrum48($rom48, MachineTiming::named('pentagon'), true);
     $m->attachBetaDisk($trdosRom);
@@ -85,7 +85,7 @@ if (is_file($rom48) && is_file($trdosRom)) {
     );
     check(!$m->memory->trdosActive, 'TR-DOS ROM should be paged out while BASIC runs');
 } else {
-    echo "TR-DOS boot test skipped (48.rom / trdos.rom not found)\n";
+    echo "TR-DOS boot test skipped (roms/48.rom / roms/trdos.rom not found)\n";
 }
 @unlink($tmp);
 echo "TR-DOS tests passed\n";

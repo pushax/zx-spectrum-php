@@ -9,7 +9,7 @@ require __DIR__ . '/src/autoload.php';
 use ZX\Spectrum\Cli\CliError;
 use ZX\Spectrum\Cli\Launcher;
 
-$launcher = new Launcher(getopt('', Launcher::OPTIONS), __DIR__);
+$launcher = new Launcher(getopt('', Launcher::OPTIONS), __DIR__ . '/roms');
 try {
     exit($launcher->run());
 } catch (CliError $e) {

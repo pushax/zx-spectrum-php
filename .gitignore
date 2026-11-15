@@ -1,9 +1,9 @@
 # ROMs without a redistribution permission: download them with `php fetch-roms.php`
-trdos.rom
-pentagon.rom
-pentagon-tr93.rom
-128TR93.ROM
-128TR.ROM
+roms/trdos.rom
+roms/pentagon.rom
+roms/pentagon-tr93.rom
+roms/128TR93.ROM
+roms/128TR.ROM
 
 # Third-party software (games, demos)
 demos/

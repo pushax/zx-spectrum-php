@@ -30,11 +30,11 @@ final class Launcher
         Usage:
          php run.php --demo
          php run.php --screen=file.scr
-         php run.php --snapshot=game.sna [--rom=48.rom] [--machine=48k|pentagon] [--no-audio]
+         php run.php --snapshot=game.sna [--rom=roms/48.rom] [--machine=48k|pentagon] [--no-audio]
                      [--gfx=auto|kitty|iterm|text] [--scale=2]
-         php run.php --boot --rom=48.rom [--machine=48k] [--no-audio] [--debug]
-         php run.php --disk=demo.trd|demo.scl --rom=pentagon.rom [--trdos=trdos.rom] [--boot]
-         php run.php --tape=game.tap|game.tzx [--machine=48k|pentagon] [--rom=48.rom] [--ay]
+         php run.php --boot --rom=roms/48.rom [--machine=48k] [--no-audio] [--debug]
+         php run.php --disk=demo.trd|demo.scl [--rom=roms/pentagon.rom] [--trdos=roms/trdos.rom] [--boot]
+         php run.php --tape=game.tap|game.tzx [--machine=48k|pentagon] [--rom=roms/48.rom] [--ay]
          php run.php --cpu-test
 
         TEXT;
@@ -49,9 +49,9 @@ final class Launcher
 
     /**
      * @param array<string, string|false> $options result of getopt()
-     * @param string $projectDir folder with the default ROM files
+     * @param string $romDir folder with the default ROM files
      */
-    public function __construct(private array $options, private readonly string $projectDir)
+    public function __construct(private array $options, private readonly string $romDir)
     {
     }
 
@@ -127,7 +127,7 @@ final class Launcher
         $rom = $this->romFile();
         if (isset($o['boot']) && ($rom === null || !is_file($rom) || !in_array(filesize($rom), [16384, 32768], true))) {
             throw new CliError(
-                'Boot requires a 16K (48K) or 32K (128K/Pentagon) ROM file. Use --boot --rom=48.rom',
+                'Boot requires a 16K (48K) or 32K (128K/Pentagon) ROM file. Use --boot --rom=roms/48.rom',
                 2
             );
         }
@@ -139,7 +139,7 @@ final class Launcher
         $machine = new Spectrum48($rom, $timing, $this->isPentagon(), isset($o['ay']));
         if ($rom === null) {
             fwrite(STDERR, "Warning: no --rom given, the ROM area is empty (0xFF). "
-                . "Most snapshots need the ROM: add --rom=48.rom\n");
+                . "Most snapshots need the ROM: add --rom=roms/48.rom\n");
         }
 
         if (isset($o['disk'])) {
@@ -164,7 +164,7 @@ final class Launcher
         return 0;
     }
 
-    /** --rom, or the default ROM in the project folder for disks (pentagon.rom) and tapes (48.rom / 128.rom). */
+    /** --rom, or the default ROM in the ROM folder for disks (pentagon.rom) and tapes (48.rom / 128.rom). */
     private function romFile(): ?string
     {
         $o = $this->options;
@@ -176,7 +176,7 @@ final class Launcher
             isset($o['tape']) => $this->isPentagon() ? '128.rom' : '48.rom', // 128.rom has "Tape Loader"
             default => null,
         };
-        $path = $default !== null ? $this->projectDir . '/' . $default : null;
+        $path = $default !== null ? $this->romDir . '/' . $default : null;
         return $path !== null && is_file($path) ? $path : null;
     }
 
@@ -201,7 +201,7 @@ final class Launcher
     /** Adds the Beta 128 interface (TR-DOS ROM from --trdos or trdos.rom) and inserts the disk. */
     private function insertDisk(Spectrum48 $machine, string $disk): void
     {
-        $trdos = (string)($this->options['trdos'] ?? $this->projectDir . '/trdos.rom');
+        $trdos = (string)($this->options['trdos'] ?? $this->romDir . '/trdos.rom');
         try {
             $machine->attachBetaDisk($trdos);
         } catch (\RuntimeException $e) {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Downloads the ROM images the emulator uses into the project folder and checks their MD5 sums.
+ * Downloads the ROM images the emulator uses into the roms/ folder and checks their MD5 sums.
  *
  *   php fetch-roms.php           # download missing ROMs
  *   php fetch-roms.php --force   # download again and overwrite
@@ -41,7 +41,10 @@ $roms = [
 ];
 
 $force = in_array('--force', $argv, true);
-$dir = __DIR__;
+$dir = __DIR__ . '/roms';
+if (!is_dir($dir)) {
+    mkdir($dir);
+}
 $failed = false;
 
 foreach ($roms as $name => [$url, $md5, $title]) {

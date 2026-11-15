@@ -43,9 +43,9 @@ $code = block("\xFF\x01\x02\x03\x04");
 file_put_contents("$dir/t.tzx", "ZXTape!\x1A\x01\x14" . "\x30\x04note" . "\x32\x05\x00\x01\x00\x02ab"
     . $turbo("\x55", 100, 300, 600) . $turbo($header, 8063) . $turbo($data, 3223) . $turbo($code, 3223, 640, 1280));
 
-$rom = __DIR__ . '/../48.rom';
+$rom = __DIR__ . '/../roms/48.rom';
 if (!is_file($rom)) {
-    echo "Tape tests skipped (48.rom not found)\n";
+    echo "Tape tests skipped (roms/48.rom not found)\n";
     exit(0);
 }
 

@@ -46,21 +46,23 @@ The demos belong to their authors and are not included in this repository; they 
 ```bash
 git clone <this repository> zx-spectrum
 cd zx-spectrum
-php fetch-roms.php                 # downloads TR-DOS and the Pentagon ROM (see ROMs below)
-php run.php --boot --rom=48.rom    # 48K BASIC
+php fetch-roms.php                      # downloads TR-DOS and the Pentagon ROM into roms/ (see ROMs below)
+php run.php --boot --rom=roms/48.rom    # 48K BASIC
 ```
 
 Press **Ctrl+C** to quit.
 
 ## ROMs
 
+All ROM images live in the `roms/` folder.
+
 | File | What | Source | In this repository |
 |---|---|---|---|
-| `48.rom` | Spectrum 48K | [Fuse](https://fuse-emulator.sourceforge.net/) | yes |
-| `128-0.rom`, `128-1.rom` | Spectrum 128: menu/128 BASIC, 48 BASIC | Fuse | yes |
-| `128.rom` | `128-0.rom` + `128-1.rom` as one 32K image | built by `fetch-roms.php` | yes |
-| `trdos.rom` | TR-DOS 5.03 (Technology Research Ltd) | [ZEsarUX](https://github.com/chernandezba/zesarux) | no, downloaded |
-| `pentagon.rom` | Pentagon 128: 128 menu with a TR-DOS item, plus 48 BASIC | ZEsarUX | no, downloaded |
+| `roms/48.rom` | Spectrum 48K | [Fuse](https://fuse-emulator.sourceforge.net/) | yes |
+| `roms/128-0.rom`, `roms/128-1.rom` | Spectrum 128: menu/128 BASIC, 48 BASIC | Fuse | yes |
+| `roms/128.rom` | `128-0.rom` + `128-1.rom` as one 32K image | built by `fetch-roms.php` | yes |
+| `roms/trdos.rom` | TR-DOS 5.03 (Technology Research Ltd) | [ZEsarUX](https://github.com/chernandezba/zesarux) | no, downloaded |
+| `roms/pentagon.rom` | Pentagon 128: 128 menu with a TR-DOS item, plus 48 BASIC | ZEsarUX | no, downloaded |
 
 `php fetch-roms.php` downloads every missing file and checks its MD5 sum. Files that are already present are left alone; `--force` downloads them again.
 
@@ -77,8 +79,8 @@ The TR-DOS ROM and the Pentagon ROM are not covered by that permission, so they 
 ## Usage
 
 ```bash
-php run.php --snapshot=game.sna --rom=48.rom       # 48K snapshot (.sna or .z80)
-php run.php --snapshot=demo.z80 --machine=pentagon --rom=128.rom   # 128K snapshot
+php run.php --snapshot=game.sna --rom=roms/48.rom  # 48K snapshot (.sna or .z80)
+php run.php --snapshot=demo.z80 --machine=pentagon --rom=roms/128.rom   # 128K snapshot
 
 php run.php --tape=game.tap                        # 48K: types LOAD "" by itself
 php run.php --tape=demo.tzx --machine=pentagon     # 128K: picks "Tape Loader" in the 128 menu
@@ -86,7 +88,7 @@ php run.php --tape=demo.tzx --machine=pentagon     # 128K: picks "Tape Loader" i
 php run.php --disk=demo.trd                        # Pentagon, TR-DOS starts the disk's "boot" file
 php run.php --disk=demo.scl --boot                 # start from the Pentagon menu; choose TR-DOS
 
-php run.php --boot --rom=128.rom --machine=pentagon   # 128 menu
+php run.php --boot --rom=roms/128.rom --machine=pentagon   # 128 menu
 ```
 
 | Option | Meaning |
@@ -95,8 +97,8 @@ php run.php --boot --rom=128.rom --machine=pentagon   # 128 menu
 | `--tape=FILE` | Insert a `.tap` or `.tzx` tape and load it. |
 | `--disk=FILE` | Insert a `.trd` or `.scl` disk into drive A. Defaults to `--machine=pentagon`. |
 | `--boot` | Start from the ROM (power on). Together with `--disk`, this shows the menu instead of booting the disk. |
-| `--rom=FILE` | 16K (48K) or 32K (128K) ROM image. With no `--rom`, disks use `pentagon.rom`, 48K tapes use `48.rom` and 128K tapes use `128.rom`. |
-| `--trdos=FILE` | TR-DOS ROM. Default: `trdos.rom` in the project folder. |
+| `--rom=FILE` | 16K (48K) or 32K (128K) ROM image. With no `--rom`, disks use `roms/pentagon.rom`, 48K tapes use `roms/48.rom` and 128K tapes use `roms/128.rom`. |
+| `--trdos=FILE` | TR-DOS ROM. Default: `roms/trdos.rom`. |
 | `--machine=48k\|pentagon` | Machine model. Default: `48k`. |
 | `--ay` | Add an AY sound chip to the 48K (like the Melodik interface). 128K machines always have one. |
 | `--gfx=auto\|kitty\|iterm\|text` | Display mode. Default: `auto`. |
@@ -154,6 +156,7 @@ Classes live in `src/` under the `ZX\Spectrum` namespace, one class per file (PS
 ```
 run.php                     command-line front end
 fetch-roms.php              ROM downloader
+roms/                       ROM images (see ROMs)
 src/
   Cpu/        Z80 (the CPU), MemoryInterface (its memory bus)
   Machine/    Spectrum48 (the whole machine, also the Pentagon), Memory (48K/128K paging, TR-DOS ROM),
@@ -209,4 +212,4 @@ A format is chosen by its signature first (`recognizes()`), then by the file ext
 
 The emulator source code is released under the [MIT License](LICENSE).
 
-The ROM images are not covered by this license. The Spectrum ROMs (`48.rom`, `128-0.rom`, `128-1.rom`, `128.rom`) remain copyright Amstrad and are included with Amstrad's permission (see [ROMs](#roms)).
+The ROM images are not covered by this license. The Spectrum ROMs in `roms/` (`48.rom`, `128-0.rom`, `128-1.rom`, `128.rom`) remain copyright Amstrad and are included with Amstrad's permission (see [ROMs](#roms)).

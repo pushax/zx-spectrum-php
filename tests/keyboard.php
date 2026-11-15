@@ -91,7 +91,7 @@ for ($f = 0; $f < 40; $f++) {
 check($capsSeen, 'Backspace after "0" must press CAPS SHIFT + 0');
 
 // Typing a BASIC line fast (as when pasting): repeated keys, shifted keys and Enter all arrive.
-$rom = __DIR__ . '/../48.rom';
+$rom = __DIR__ . '/../roms/48.rom';
 if (is_file($rom)) {
     $m = new Spectrum48($rom);
     for ($f = 0; $f < 100; $f++) {
@@ -111,6 +111,6 @@ if (is_file($rom)) {
     }
     check($line === "\xF5\"Hi ll\"\x0D", 'BASIC line 10 should be PRINT "Hi ll", got ' . bin2hex($line));
 } else {
-    echo "BASIC typing test skipped (48.rom not found)\n";
+    echo "BASIC typing test skipped (roms/48.rom not found)\n";
 }
 echo "Keyboard tests passed\n";
